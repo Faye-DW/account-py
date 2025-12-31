@@ -22,13 +22,28 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        # 安装 PyQt6 运行所需的库和虚拟显示器
-        sudo apt-get install -y libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0 x11-utils xvfb
+        # 补充安装 libegl1 和 libgl1-mesa-glx 以修复 OpenGL 依赖问题
+        sudo apt-get install -y \
+          libegl1 \
+          libgl1-mesa-glx \
+          libxcb-cursor0 \
+          libxkbcommon-x11-0 \
+          libxcb-icccm4 \
+          libxcb-image0 \
+          libxcb-keysyms1 \
+          libxcb-randr0 \
+          libxcb-render-util0 \
+          libxcb-xinerama0 \
+          libxcb-xfixes0 \
+          x11-utils \
+          xvfb
 
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        # 确保根目录下有 requirements.txt 文件
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install pytest pytest-cov PyQt6
 
     - name: Run tests with xvfb
       run: |
