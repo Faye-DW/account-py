@@ -7,28 +7,29 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build-and-test:
+  test:
+    # 使用最新的 Ubuntu 环境
     runs-on: ubuntu-latest
 
     steps:
-    # 1. 检出代码
+    # 第一步：下载仓库代码
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # 2. 设置 Python 环境
+    # 第二步：安装 Python 3.12
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
 
-    # 3. 安装依赖 (仅需 pytest 和 pytest-cov)
+    # 第三步：安装依赖项
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    # 4. 执行测试并生成覆盖率报告
+    # 第四步：运行测试并输出覆盖率报告
     - name: Run tests with pytest
       run: |
-        # 针对 logic.py 运行测试并输出覆盖率
+        # 运行测试并统计 logic.py 的覆盖率
         pytest --cov=logic --cov-report=term-missing
