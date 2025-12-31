@@ -1,4 +1,4 @@
-name: Python Ledger Project CI
+name: Python Ledger Logic CI
 
 on:
   push:
@@ -7,45 +7,28 @@ on:
     branches: [ main, master ]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
+    # 1. 检出代码
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    # 2. 设置 Python 环境
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        # 补充安装 libegl1 和 libgl1-mesa-glx 以修复 OpenGL 依赖问题
-        sudo apt-get install -y \
-          libegl1 \
-          libgl1-mesa-glx \
-          libxcb-cursor0 \
-          libxkbcommon-x11-0 \
-          libxcb-icccm4 \
-          libxcb-image0 \
-          libxcb-keysyms1 \
-          libxcb-randr0 \
-          libxcb-render-util0 \
-          libxcb-xinerama0 \
-          libxcb-xfixes0 \
-          x11-utils \
-          xvfb
-
-    - name: Install Python dependencies
+    # 3. 安装依赖 (仅需 pytest 和 pytest-cov)
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        # 确保根目录下有 requirements.txt 文件
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        pip install pytest pytest-cov PyQt6
 
-    - name: Run tests with xvfb
+    # 4. 执行测试并生成覆盖率报告
+    - name: Run tests with pytest
       run: |
-        # 使用 xvfb-run 启动虚拟显示器执行 pytest
-        xvfb-run --auto-servernum pytest --cov=pro --cov-report=xml
+        # 针对 logic.py 运行测试并输出覆盖率
+        pytest --cov=logic --cov-report=term-missing
